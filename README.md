@@ -12,6 +12,7 @@ For each data type, we only have to pass **the function handle** for loading dat
 3. mat 
 4. avi 
 5. npy 
+6. mat_cnmfe: this is a format optimized for running [CNMF-E](https://github.com/zhoupc/CNMF_E) analysis
 
 and it provides a flexible interface for calling your customized loader. 
 
@@ -33,7 +34,7 @@ OPTION 2: (recommended) clone the git repository <https://github.com/zhoupc/idl.
 ## Installation
 Run idl_setup.m to add IDL  to the search path of MATLAB
 
-`>> idl_set`
+`>> idl_setup`
 
 ## Examples
 We provided some demos in .**/demos/demo_idl.m**. You can learn the usage of the package by running the demo script. 
