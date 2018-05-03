@@ -8,8 +8,8 @@ if ~exist('demo_data', 'var')
     num_frames = temp(4);
 end
 
-clear Y_all Y_part; 
-test_format = 'tif';   % supported formats: {mat, hdf5, tif, avi, npy}
+clear Y_all Y_part;
+test_format = 'npy';   % supported formats: {mat, hdf5, tif, avi, npy}
 
 %%
 switch lower(test_format)
@@ -75,18 +75,22 @@ switch lower(test_format)
                 writeNPY(block, fn);
             end
         end
+    case {'mat_cnmfe', '.mat_cnmfe'}
+        vars = {fullfile(data_folder, 'mat_cnmfe_data_'), '.mat'};
+        get_filename = @(vars, z) sprintf('%s%d%s', vars{1}, z, vars{2});
+        
     otherwise
         disp('sorry, IDL does not support to this file format yet. ');
 end
 
 %% creating a class object
-tic; 
+tic;
 
 data = IDL('vars', vars, 'fname', get_filename, 'type', test_format, 'dims', ...
     dims, 'num_frames', num_frames);
 
 % load the whole volume
-Y_all = data.load_tzrc(); 
+Y_all = data.load_tzrc();
 
 % partially load data
 t_range = [201, 300];
@@ -95,18 +99,18 @@ r_range = [6, 20];
 c_range = [11, 30];
 Y_part = data.load_tzrc(t_range, z_range, r_range, c_range);
 
-toc; 
+toc;
 %%
-cn1 = correlation_image(squeeze(Y_all(:, :, 1, :))); 
-cn_part = correlation_image(Y_part); 
+cn1 = correlation_image(squeeze(Y_all(:, :, 1, :)));
+cn_part = correlation_image(Y_part);
 
-figure; 
-subplot(121); 
-imagesc(cn1); 
-axis equal off tight; 
-subplot(122); 
-imagesc(cn_part); 
-axis equal off tight; 
+figure;
+subplot(121);
+imagesc(cn1);
+axis equal off tight;
+subplot(122);
+imagesc(cn_part);
+axis equal off tight;
 %%
 
 

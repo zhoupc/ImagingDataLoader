@@ -55,8 +55,8 @@ classdef IDL < handle
                     load_fun = @tiff_read;
                 case {'mat', '.mat'}
                     load_fun = @mat_read;
-                case 'cnmfe_mat'
-                    load_fun = @bigread2;
+                case {'mat_cnmfe', '.mat_cnmfe'}
+                    load_fun = @mat_cnmfe_read;
                 case {'hdf5', 'h5'}
                     load_fun = @hdf5_read; 
                 case {'avi', '.avi'}
