@@ -14,7 +14,8 @@ classdef IDL < handle
         fname = @(vars, z) vars{z};
         dims = [0, 0, 1];  % dimension of data (x, y, z)
         num_frames = [];  % number of frames
-        nfiles = true;    % different planes were saved into differnet files 
+        nfiles = true;    % different planes were saved into differnet files
+        shifts = [0, 0, 0, 0]; % shifts to [r, c, z, t]
     end
     
     %% methods
@@ -57,12 +58,14 @@ classdef IDL < handle
                     load_fun = @mat_read;
                 case {'mat_cnmfe', '.mat_cnmfe'}
                     load_fun = @mat_cnmfe_read;
+                case {'mat4d', '.mat4d'}
+                    load_fun = @mat4d_read;
                 case {'hdf5', 'h5'}
-                    load_fun = @hdf5_read; 
+                    load_fun = @hdf5_read;
                 case {'avi', '.avi'}
-                    load_fun = @avi_read; 
+                    load_fun = @avi_read;
                 case {'npy', '.npy'}
-                    load_fun = @npy_read; 
+                    load_fun = @npy_read;
                 otherwise
                     load_fun = [];
                     warning('not specified yet');
@@ -82,10 +85,10 @@ classdef IDL < handle
             if ~exist('z_range', 'var') || isempty(z_range)  % load single plane
                 z_range = [1, obj.dims(3)];
             elseif length(z_range) ==1
-                z_range = ones(1,2) * z_range; 
+                z_range = ones(1,2) * z_range;
             end
-            if ~exist('t_range', 'var') || isempty(z_range)
-                t_range = [1, obj.num_frames]; 
+            if ~exist('t_range', 'var') || isempty(t_range)
+                t_range = [1, obj.num_frames];
             end
             
             T = diff(t_range) + 1;
@@ -93,10 +96,19 @@ classdef IDL < handle
             nr = diff(r_range) + 1;
             nc = diff(c_range) + 1;
             
+            %% apply shifts
+            if any(obj.shifts)
+                temp = 'rczt';
+                for m=1:4
+                    if obj.shifts(m)
+                        eval(sprintf('%s_range = %s_range+%d;', temp(m), temp(m), obj.shifts(m)));
+                    end
+                end
+            end
             %% load data
-            if obj.nfiles 
-                % multiple plane data were saved into multiple files 
-                if nz == 1  % single plane 
+            if obj.nfiles
+                % multiple plane data were saved into multiple files
+                if nz == 1  % single plane
                     filename = obj.get_fn(z_range(1));
                     imData = obj.fload(filename, t_range, r_range, c_range);
                 else        % multiple planes
@@ -110,10 +122,14 @@ classdef IDL < handle
                 end
             else
                 % a single file containing all data
-                filename = obj.get_fn(1); 
+                filename = obj.get_fn(1);
                 imData = obj.fload(filename, t_range, z_range, r_range, c_range);
             end
             
+            %% 
+            if nz==1
+                imData = squeeze(imData); 
+            end
         end
         
         %% parse inputs
@@ -158,15 +174,21 @@ classdef IDL < handle
                     case {'t', 'num_frames'}
                         obj.num_frames = varargin{k+1};
                         k = k + 2;
+                    case {'nfiles'}
+                        obj.nfiles = logical(varargin{k+1});
+                        k = k + 2;
+                    case {'shifts'}
+                        obj.shifts = varargin{k+1};
+                        k = k + 2;
                     otherwise
                         k = k+1;
                 end
             end
         end
         
-        %% get file name given the plane id 
+        %% get file name given the plane id
         function filename = get_fn(obj, z)
-           filename = obj.fname(obj.vars, z);
+            filename = obj.fname(obj.vars, z);
         end
     end
 end

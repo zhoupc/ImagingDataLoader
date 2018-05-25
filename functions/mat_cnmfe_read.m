@@ -88,7 +88,7 @@ for m=1:nr_block
 end
 
 %% remove the overlapping area
-if (r0_patch ~= block_rstart+1) && (c0_patch ~=block_cstart+1)
+if (r0_patch ~= block_rstart+1) || (c0_patch ~=block_cstart+1)
     Y = Y((r0_patch:r1_patch)-block_rstart, (c0_patch:c1_patch)-block_cstart, :);
 end
 

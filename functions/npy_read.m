@@ -13,11 +13,20 @@ function imData = npy_read(path_to_file, t_range, r_range, c_range)
 
 [shape, dataType, fortranOrder, ~, totalHeaderLength, ~] = ...
     readNPYheader(path_to_file);
-
+if ~exist('t_range', 'var') || isempty(t_range)
+    t_range = [1, shape(3)];
+end
+if ~exist('r_range', 'var') || isempty(r_range)
+    r_range = [1, shape(1)];
+end
+if ~exist('c_range', 'var') || isempty(c_range)
+    c_range = [1, shape(2)];
+end
 if fortranOrder
     % [r, c, t]
     mmap = memmapfile(path_to_file, 'Offset', totalHeaderLength, ...
         'Format', {dataType, shape, 'Y'});
+    
     if prod(shape)==r_range(2) * c_range(2) * t_range(2)
         imData = mmap.Data.Y;
     else
