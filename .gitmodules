@@ -2,3 +2,6 @@
 	path = packages/npy-matlab
 	url = https://github.com/kwikteam/npy-matlab.git
 
+[submodule "packages/TIFFStack"]
+	path = packages/TIFFStack
+	url = https://github.com/DylanMuir/TIFFStack.git
