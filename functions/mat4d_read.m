@@ -9,12 +9,6 @@ data = matfile(path_to_file);
 data_info = whos(data);
 dims = data_info.size; 
 
-if diff(t_range)+1 == dims(4)
-    t_str = ':'; 
-else
-    t_str = 'seq(t_range)'; 
-end
-
 if diff(z_range)+1 == dims(3)
     z_str = ':'; 
 else
@@ -33,5 +27,13 @@ else
     c_str = 'seq(c_range)'; 
 end
 
-
-imData = eval(sprintf('data.%s(%s,%s,%s, %s)', data_info.name, r_str, c_str, z_str,t_str)); 
+if length(dims) < 4
+    imData = eval(sprintf('data.%s(%s,%s,%s)', data_info.name, r_str, c_str, z_str));
+else
+    if diff(t_range)+1 == dims(4)
+        t_str = ':';
+    else
+        t_str = 'seq(t_range)';
+    end
+    imData = eval(sprintf('data.%s(%s,%s,%s, %s)', data_info.name, r_str, c_str, z_str,t_str));
+end
